@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background: #2f80ed;
+    color: #fff;
+    text-align: center;
+    padding: 1.5rem 0;
+}
+
+header .logo {
+    width: 100px;
+    margin-bottom: 1rem;
+}
+
+header h1 span {
+    color: #f2c94c;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    color: #2f80ed;
+    background: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 1rem;
+}
+
+.cta-button:hover {
+    background: #f2c94c;
+    color: #fff;
+}
+
+.features {
+    padding: 2rem;
+    background: #f9f9f9;
+    text-align: center;
+}
+
+.features h2 {
+    color: #2f80ed;
+}
+
+.feature-grid {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.feature img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 1rem;
+}
+
+.cta-section {
+    background: #f2c94c;
+    color: #fff;
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.download-button {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    color: #f2c94c;
+    background: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 1rem;
+}
+
+.download-button:hover {
+    background: #2f80ed;
+    color: #fff;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem 0;
+    background: #333;
+    color: #fff;
+}
+
+footer a {
+    color: #f2c94c;
+    text-decoration: none;
+}
