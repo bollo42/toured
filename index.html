@@ -1,48 +1,1371 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>toured - Entdecke deine perfekte Route</title>
-    <link rel="stylesheet" href="styles/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOURED — Discover. Eat. Explore.</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #c0281e;
+    --red-light: #e03328;
+    --dark: #0e0e0e;
+    --cream: #f5f0e8;
+    --sand: #e8e0d0;
+    --white: #ffffff;
+    --pin: #c0281e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--red);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s, opacity 0.2s;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--red);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.18s ease, width 0.2s, height 0.2s, opacity 0.2s;
+    opacity: 0.5;
+  }
+  a:hover ~ .cursor, button:hover ~ .cursor { transform: translate(-50%,-50%) scale(2.5); }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9000;
+    opacity: 0.35;
+  }
+
+  /* ─── NAVBAR ─────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 48px;
+    mix-blend-mode: normal;
+  }
+  nav::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(14,14,14,0.9) 0%, transparent 100%);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* Inline SVG Logo — app icon */
+  .app-icon {
+    width: 40px; height: 40px;
+    flex-shrink: 0;
+  }
+
+  .nav-wordmark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.7rem;
+    letter-spacing: 0.12em;
+    color: var(--cream);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--cream);
+    text-decoration: none;
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  .nav-cta {
+    background: var(--red);
+    color: var(--white) !important;
+    opacity: 1 !important;
+    padding: 10px 22px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--red-light) !important; }
+
+  /* ─── HERO ───────────────────────────────── */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 120px 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-circle {
+    position: absolute;
+    width: 700px; height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(192,40,30,0.12) 0%, transparent 70%);
+    right: -150px; top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .hero-grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(245,240,232,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,240,232,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .hero-left {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 28px; height: 1px;
+    background: var(--red);
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 9vw, 9rem);
+    line-height: 0.92;
+    letter-spacing: 0.04em;
+    margin-bottom: 32px;
+    position: relative;
+  }
+
+  /* Big wordmark with pin replacing O */
+  .toured-wordmark-big {
+    display: inline-flex;
+    align-items: baseline;
+    position: relative;
+  }
+  .toured-wordmark-big .t-part { color: var(--cream); }
+  .toured-wordmark-big .pin-o {
+    position: relative;
+    display: inline-block;
+    width: 0.55em;
+  }
+  .toured-wordmark-big .pin-o svg {
+    position: absolute;
+    bottom: 0.05em;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0.6em;
+    height: auto;
+  }
+  .toured-wordmark-big .ured { color: var(--cream); }
+
+  .hero-subtitle {
+    font-size: 1.05rem;
+    font-weight: 300;
+    line-height: 1.7;
+    color: rgba(245,240,232,0.6);
+    max-width: 420px;
+    margin-bottom: 44px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 16px 36px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: none;
+    transition: background 0.2s, transform 0.2s;
+    text-decoration: none;
+  }
+  .btn-primary:hover { background: var(--red-light); transform: translateY(-2px); }
+
+  .btn-ghost {
+    color: var(--cream);
+    border: 1px solid rgba(245,240,232,0.25);
+    padding: 16px 36px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: none;
+    transition: border-color 0.2s, transform 0.2s;
+    text-decoration: none;
+  }
+  .btn-ghost:hover { border-color: var(--cream); transform: translateY(-2px); }
+
+  .hero-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Floating phone mockup */
+  .phone-mockup {
+    width: 280px;
+    background: #1a1a1a;
+    border-radius: 40px;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 20px 16px;
+    box-shadow:
+      0 40px 100px rgba(0,0,0,0.6),
+      0 0 0 1px rgba(255,255,255,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+    animation: float 6s ease-in-out infinite;
+    position: relative;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(-2deg); }
+    50% { transform: translateY(-20px) rotate(-2deg); }
+  }
+
+  .phone-notch {
+    width: 80px; height: 6px;
+    background: #0e0e0e;
+    border-radius: 3px;
+    margin: 0 auto 16px;
+  }
+
+  .phone-screen {
+    background: #111;
+    border-radius: 24px;
+    overflow: hidden;
+    aspect-ratio: 9/16;
+    position: relative;
+  }
+
+  .map-bg {
+    width: 100%; height: 100%;
+    background:
+      linear-gradient(135deg, #1a2a1a 0%, #0d1a0d 50%, #1a1505 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .map-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .map-road {
+    position: absolute;
+    background: rgba(255,255,255,0.07);
+  }
+  .road-h { height: 3px; width: 100%; top: 40%; }
+  .road-h2 { height: 2px; width: 100%; top: 65%; }
+  .road-v { width: 3px; height: 100%; left: 35%; }
+  .road-v2 { width: 2px; height: 100%; left: 70%; }
+
+  .map-pin {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: pinPop 3s ease-in-out infinite;
+  }
+  @keyframes pinPop {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-4px) scale(1.05); }
+  }
+  .map-pin:nth-child(3) { top: 30%; left: 30%; animation-delay: 0s; }
+  .map-pin:nth-child(4) { top: 55%; left: 65%; animation-delay: 1s; }
+  .map-pin:nth-child(5) { top: 20%; left: 62%; animation-delay: 2s; }
+
+  .pin-head {
+    width: 20px; height: 20px;
+    background: var(--red);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(192,40,30,0.5);
+  }
+  .pin-head::after {
+    content: '';
+    width: 7px; height: 7px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 50%;
+    transform: rotate(45deg);
+  }
+
+  .pin-label {
+    margin-top: 4px;
+    background: rgba(14,14,14,0.9);
+    border: 1px solid rgba(192,40,30,0.3);
+    color: var(--cream);
+    font-size: 7px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .phone-ui-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(14,14,14,0.95);
+    backdrop-filter: blur(12px);
+    padding: 12px 14px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .phone-ui-spot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .spot-icon {
+    width: 28px; height: 28px;
+    background: var(--red);
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .spot-info { flex: 1; }
+  .spot-name {
+    font-size: 8px;
+    font-weight: 600;
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .spot-meta {
+    font-size: 7px;
+    color: rgba(245,240,232,0.4);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .spot-stars {
+    font-size: 8px;
+    color: var(--red);
+    letter-spacing: -1px;
+  }
+
+  /* floating badges around phone */
+  .float-badge {
+    position: absolute;
+    background: rgba(14,14,14,0.9);
+    border: 1px solid rgba(192,40,30,0.3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.72rem;
+    color: var(--cream);
+    white-space: nowrap;
+    backdrop-filter: blur(8px);
+    animation: floatBadge 5s ease-in-out infinite;
+  }
+  @keyframes floatBadge {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .badge-1 { left: -90px; top: 18%; animation-delay: 0.5s; }
+  .badge-2 { right: -90px; top: 40%; animation-delay: 1.5s; }
+  .badge-3 { left: -80px; bottom: 22%; animation-delay: 1s; }
+
+  .badge-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  /* ─── SCROLL TICKER ──────────────────────── */
+  .ticker-wrap {
+    background: var(--red);
+    padding: 14px 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .ticker-track {
+    display: flex;
+    animation: ticker 20s linear infinite;
+    width: max-content;
+  }
+  .ticker-track span {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    color: var(--white);
+    padding: 0 28px;
+    white-space: nowrap;
+    opacity: 0.9;
+  }
+  .ticker-track .sep {
+    opacity: 0.4;
+    padding: 0 4px;
+  }
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ─── FEATURES ───────────────────────────── */
+  #features {
+    padding: 120px 48px;
+    position: relative;
+  }
+
+  .section-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--red);
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.8rem, 5vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: 0.03em;
+    color: var(--cream);
+    margin-bottom: 72px;
+  }
+  .section-title em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: rgba(245,240,232,0.45);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .feature-card {
+    background: #141414;
+    padding: 48px 36px;
+    border: 1px solid rgba(255,255,255,0.04);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.35s;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s, transform 0.6s, background 0.35s;
+  }
+  .feature-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .feature-card:hover { background: #1c1c1c; }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    transform: scaleX(0);
+    transition: transform 0.4s;
+  }
+  .feature-card:hover::before { transform: scaleX(1); }
+
+  .feature-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem;
+    color: rgba(192,40,30,0.12);
+    line-height: 1;
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  .feature-icon {
+    width: 44px; height: 44px;
+    background: rgba(192,40,30,0.12);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+  }
+
+  .feature-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.08em;
+    color: var(--cream);
+    margin-bottom: 12px;
+  }
+
+  .feature-desc {
+    font-size: 0.85rem;
+    line-height: 1.75;
+    color: rgba(245,240,232,0.45);
+    font-weight: 300;
+  }
+
+  /* ─── BIG STATEMENT ──────────────────────── */
+  #statement {
+    padding: 160px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  #statement::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 50%, rgba(192,40,30,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .statement-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.5rem, 7vw, 8rem);
+    line-height: 1;
+    letter-spacing: 0.03em;
+    color: var(--cream);
+    max-width: 900px;
+    margin: 0 auto 48px;
+  }
+  .statement-text .accent { color: var(--red); }
+  .statement-text .italic {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.85em;
+    color: rgba(245,240,232,0.5);
+  }
+
+  .statement-sub {
+    font-size: 1rem;
+    color: rgba(245,240,232,0.45);
+    max-width: 440px;
+    margin: 0 auto 56px;
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  /* horizontal scroll logos row */
+  .logos-row {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 80px;
+    opacity: 0.25;
+    filter: grayscale(1);
+  }
+  .logos-row span {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.2em;
+    color: var(--cream);
+  }
+
+  /* ─── HOW IT WORKS ───────────────────────── */
+  #how {
+    padding: 120px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 24px;
+    padding: 32px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+  .step.visible { opacity: 1; transform: translateX(0); }
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    color: rgba(192,40,30,0.3);
+    line-height: 1;
+    min-width: 50px;
+    padding-top: 4px;
+  }
+
+  .step-body {}
+  .step-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.06em;
+    color: var(--cream);
+    margin-bottom: 8px;
+  }
+  .step-text {
+    font-size: 0.84rem;
+    line-height: 1.75;
+    color: rgba(245,240,232,0.45);
+    font-weight: 300;
+  }
+
+  .how-visual {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .visual-card {
+    background: #141414;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 24px;
+    width: 320px;
+    position: relative;
+  }
+
+  .vc-map {
+    height: 180px;
+    background: #0d1a0d;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .vc-map-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  .vc-pins { position: absolute; inset: 0; }
+  .vc-pin {
+    position: absolute;
+    width: 12px; height: 12px;
+    background: var(--red);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 0 8px rgba(192,40,30,0.6);
+  }
+  .vc-pin:nth-child(1) { top: 30%; left: 40%; }
+  .vc-pin:nth-child(2) { top: 55%; left: 65%; }
+  .vc-pin:nth-child(3) { top: 20%; left: 70%; }
+  .vc-pin:nth-child(4) { top: 65%; left: 25%; }
+
+  .vc-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    color: var(--cream);
+    margin-bottom: 6px;
+  }
+  .vc-meta {
+    font-size: 0.75rem;
+    color: rgba(245,240,232,0.35);
+    display: flex;
+    gap: 12px;
+  }
+  .vc-meta span { display: flex; align-items: center; gap: 4px; }
+
+  .vc-stacked {
+    position: absolute;
+    width: 220px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 14px;
+    top: -24px;
+    right: -36px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .vc-stacked-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .vc-stacked-row:last-child { border-bottom: none; }
+  .vc-dot { width: 8px; height: 8px; background: var(--red); border-radius: 50%; }
+  .vc-rname { font-size: 0.75rem; color: var(--cream); font-weight: 500; }
+  .vc-rscore {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: rgba(245,240,232,0.4);
+  }
+
+  /* ─── AUDIENCE ───────────────────────────── */
+  #audience {
+    padding: 120px 48px;
+    background: #0a0a0a;
+  }
+
+  .audience-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 64px;
+  }
+
+  .audience-card {
+    padding: 40px 28px;
+    background: #101010;
+    border: 1px solid rgba(255,255,255,0.03);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+  .audience-card.visible { opacity: 1; transform: translateY(0); }
+  .audience-card:hover .aud-bg { opacity: 1; }
+
+  .aud-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(192,40,30,0.04) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .aud-icon {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+  .aud-type {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+    color: var(--cream);
+    margin-bottom: 12px;
+  }
+  .aud-desc {
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: rgba(245,240,232,0.4);
+    font-weight: 300;
+  }
+  .aud-tags {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .aud-tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--red);
+    border: 1px solid rgba(192,40,30,0.25);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  /* ─── CTA ────────────────────────────────── */
+  #cta {
+    padding: 160px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  #cta::before {
+    content: 'TOURED';
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30vw;
+    letter-spacing: 0.05em;
+    color: rgba(192,40,30,0.04);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .cta-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 5.5vw, 6.5rem);
+    line-height: 0.95;
+    letter-spacing: 0.03em;
+    color: var(--cream);
+    margin-bottom: 24px;
+  }
+  .cta-title .red { color: var(--red); }
+
+  .cta-sub {
+    font-size: 1rem;
+    color: rgba(245,240,232,0.45);
+    margin-bottom: 52px;
+    font-weight: 300;
+  }
+
+  .cta-badges {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+
+  .store-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 14px 24px;
+    text-decoration: none;
+    color: var(--cream);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .store-btn:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+  }
+  .store-icon { font-size: 1.4rem; }
+  .store-label { text-align: left; }
+  .store-small { font-size: 0.65rem; opacity: 0.5; letter-spacing: 0.05em; text-transform: uppercase; }
+  .store-name { font-size: 0.95rem; font-weight: 500; }
+
+  /* ─── FOOTER ─────────────────────────────── */
+  footer {
+    padding: 48px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .footer-copy {
+    font-size: 0.75rem;
+    color: rgba(245,240,232,0.3);
+    letter-spacing: 0.04em;
+  }
+  .footer-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .footer-links a {
+    font-size: 0.75rem;
+    color: rgba(245,240,232,0.3);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--cream); }
+
+  /* ─── SCROLL ANIMATIONS ──────────────────── */
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  [data-reveal].revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Horizontal parallax line */
+  .parallax-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(192,40,30,0.4) 50%, transparent 100%);
+    width: 60%;
+    margin: 0 auto;
+    transform: scaleX(0);
+    transition: transform 1.2s ease;
+  }
+  .parallax-line.revealed { transform: scaleX(1); }
+</style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <img src="images/IMG_0036.jpeg" class="logo">
-            <h1>Willkommen bei <span>toured</span></h1>
-            <p>Plane deinen perfekten Tag mit beliebten Routen und Foodspots!</p>
-            <a href="#" class="cta-button">Mehr erfahren</a>
-        </div>
-    </header>
 
-    <main>
-        <section class="features">
-            <h2>Was bietet toured?</h2>
-            <div class="feature-grid">
-                <div class="feature">
-                    <img src="images/routes.png" alt="Routen-Icon">
-                    <h3>Beliebte Routen</h3>
-                    <p>Buche vorgeplante Routen mit Sehenswürdigkeiten und Restaurants.</p>
-                </div>
-                <div class="feature">
-                    <img src="images/map.png" alt="Karten-Icon">
-                    <h3>Foodspots</h3>
-                    <p>Finde gehypte Foodspots in deiner Nähe mit unserer Kartenansicht.</p>
-                </div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo">
+    <!-- App Icon SVG (circled logo: TOU/RED red rounded square) -->
+    <svg class="app-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100" height="100" rx="22" fill="#C0281E"/>
+      <text x="50" y="44" font-family="'Bebas Neue', sans-serif" font-size="32" fill="white" text-anchor="middle" letter-spacing="1">TOU</text>
+      <text x="50" y="78" font-family="'Bebas Neue', sans-serif" font-size="32" fill="white" text-anchor="middle" letter-spacing="1">RED</text>
+    </svg>
+    <span class="nav-wordmark">TOURED</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#audience">Für wen</a></li>
+    <li><a href="#cta" class="nav-cta">App holen</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-bg-circle"></div>
+  <div class="hero-grid-lines"></div>
+
+  <div class="hero-left">
+    <div class="hero-eyebrow">Food Discovery App</div>
+    <h1 class="hero-title">
+      <!-- Big SVG wordmark with pin replacing O -->
+      <svg viewBox="0 0 520 130" style="width:100%;max-width:560px;overflow:visible;" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- T -->
+        <text x="0" y="110" font-family="'Bebas Neue', cursive" font-size="130" fill="#F5F0E8" letter-spacing="8">T</text>
+        <!-- pin as O -->
+        <g transform="translate(76, 8)">
+          <!-- pin shape -->
+          <path d="M42 0 C18.8 0 0 18.8 0 42 C0 65.2 42 105 42 105 C42 105 84 65.2 84 42 C84 18.8 65.2 0 42 0Z" fill="#C0281E"/>
+          <circle cx="42" cy="40" r="16" fill="rgba(255,255,255,0.25)"/>
+        </g>
+        <!-- URED -->
+        <text x="174" y="110" font-family="'Bebas Neue', cursive" font-size="130" fill="#F5F0E8" letter-spacing="8">URED</text>
+      </svg>
+    </h1>
+    <p class="hero-subtitle">
+      Entdecke die besten Restaurants und Food-Spots in deiner Umgebung — authentisch bewertet, präzise gefiltert, immer aktuell.
+    </p>
+    <div class="hero-actions">
+      <a href="#cta" class="btn-primary">Jetzt starten</a>
+      <a href="#features" class="btn-ghost">Mehr erfahren</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div style="position:relative;">
+      <div class="float-badge badge-1">
+        <span class="badge-dot"></span> 4.9 ★ Neapolitan Pizza
+      </div>
+      <div class="float-badge badge-2">
+        <span class="badge-dot"></span> 2 min entfernt
+      </div>
+      <div class="float-badge badge-3">
+        <span class="badge-dot"></span> High Protein ✓
+      </div>
+
+      <div class="phone-mockup">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="map-bg">
+            <div class="map-grid"></div>
+            <div class="map-road road-h"></div>
+            <div class="map-road road-h2"></div>
+            <div class="map-road road-v"></div>
+            <div class="map-road road-v2"></div>
+            <div class="map-pin" style="top:28%;left:32%;">
+              <div class="pin-head"></div>
+              <div class="pin-label">Sushi Ken</div>
             </div>
-        </section>
+            <div class="map-pin" style="top:50%;left:62%;">
+              <div class="pin-head"></div>
+              <div class="pin-label">Osteria</div>
+            </div>
+            <div class="map-pin" style="top:18%;left:60%;">
+              <div class="pin-head"></div>
+              <div class="pin-label">Burger Co.</div>
+            </div>
+          </div>
+          <div class="phone-ui-bar">
+            <div class="phone-ui-spot">
+              <div class="spot-icon"></div>
+              <div class="spot-info">
+                <div class="spot-name">Trattoria del Gusto</div>
+                <div class="spot-meta">380m · Italienisch · 25–35€</div>
+              </div>
+              <div class="spot-stars">★★★★★</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <section class="cta-section">
-            <h2>Bald verfügbar!</h2>
-            <p>Erlebe eine neue Art zu planen und entdecken. Bleib gespannt!</p>
-            <a href="#" class="download-button">Kontakt aufnehmen</a>
-        </section>
-    </main>
+<!-- ── TICKER ── -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span>DISCOVERED</span><span class="sep">◆</span>
+    <span>AUTHENTIC</span><span class="sep">◆</span>
+    <span>EXPLORE</span><span class="sep">◆</span>
+    <span>EAT LOCAL</span><span class="sep">◆</span>
+    <span>WANNA TRY</span><span class="sep">◆</span>
+    <span>HIGH PROTEIN</span><span class="sep">◆</span>
+    <span>VEGAN</span><span class="sep">◆</span>
+    <span>NO TOURIST TRAPS</span><span class="sep">◆</span>
+    <span>TOURS DONE</span><span class="sep">◆</span>
+    <!-- repeat for seamless loop -->
+    <span>DISCOVERED</span><span class="sep">◆</span>
+    <span>AUTHENTIC</span><span class="sep">◆</span>
+    <span>EXPLORE</span><span class="sep">◆</span>
+    <span>EAT LOCAL</span><span class="sep">◆</span>
+    <span>WANNA TRY</span><span class="sep">◆</span>
+    <span>HIGH PROTEIN</span><span class="sep">◆</span>
+    <span>VEGAN</span><span class="sep">◆</span>
+    <span>NO TOURIST TRAPS</span><span class="sep">◆</span>
+    <span>TOURS DONE</span><span class="sep">◆</span>
+  </div>
+</div>
 
-    <footer>
-        <p>&copy; 2026 toured. Alle Rechte vorbehalten.</p>
-        <a href="mailto:info@toured.com">info@toured.com</a>
-    </footer>
+<!-- ── FEATURES ── -->
+<section id="features">
+  <div data-reveal>
+    <div class="section-label">Kernfunktionen</div>
+    <h2 class="section-title">Alles, was du<br><em>wirklich brauchst</em></h2>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-num">01</div>
+      <div class="feature-name">KARTE & PINS</div>
+      <p class="feature-desc">Alle Spots als interaktive Pins auf der Karte. Filter nach Preis, Distanz, Küche, Tageszeit oder Mahlzeit — und spezielle Routes wie High Protein oder Vegan.</p>
+    </div>
+    <div class="feature-card" style="transition-delay:0.1s">
+      <div class="feature-num">02</div>
+      <div class="feature-name">SPOT-DETAILS</div>
+      <p class="feature-desc">Beim Antippen: eingebettete TikToks und Reels, Google-Bewertungen, Öffnungszeiten, Preise, Wartezeit und eine KI-Zusammenfassung — alles auf einen Blick.</p>
+    </div>
+    <div class="feature-card" style="transition-delay:0.2s">
+      <div class="feature-num">03</div>
+      <div class="feature-name">LISTEN & PLANUNG</div>
+      <p class="feature-desc">Erstelle deine persönliche „Wanna Try"-Liste, teile sie mit Freunden oder plant gemeinsam eure nächste Food-Tour.</p>
+    </div>
+    <div class="feature-card" style="transition-delay:0.3s">
+      <div class="feature-num">04</div>
+      <div class="feature-name">EHRLICHE BEWERTUNGEN</div>
+      <p class="feature-desc">Up- und Downvotes, authentisch gefiltert nach Standort. Nur wer wirklich dort war, kann bewerten. Kein Tourist-Bullshit.</p>
+    </div>
+    <div class="feature-card" style="transition-delay:0.4s">
+      <div class="feature-num">05</div>
+      <div class="feature-name">PUNKTESYSTEM</div>
+      <p class="feature-desc">Sammle Punkte fürs Kommentieren und Entdecken. Werde zum „Tourer" — mit Badges, Rängen und Animationen die dich motivieren.</p>
+    </div>
+    <div class="feature-card" style="transition-delay:0.5s">
+      <div class="feature-num">06</div>
+      <div class="feature-name">OFFLINE KARTEN</div>
+      <p class="feature-desc">Im Abo: unbegrenzte Listen, Offline-Karten und Zugang zu exklusiven Detailinfos. Auch auf Reisen immer bestens informiert.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATEMENT ── -->
+<section id="statement">
+  <div data-reveal class="parallax-line" style="margin-bottom:80px;"></div>
+  <div data-reveal>
+    <p class="statement-text">
+      Kein<span class="accent"> Google Maps.</span><br>
+      Kein <span class="italic">TripAdvisor.</span><br>
+      Das ist <span class="accent">TOURED.</span>
+    </p>
+    <p class="statement-sub">
+      Designed für Menschen, die wissen wollen wo die Locals essen — nicht wo die Touristen hingehen.
+    </p>
+    <a href="#cta" class="btn-primary">Jetzt kostenlos starten</a>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section id="how">
+  <div>
+    <div class="section-label" data-reveal>So funktioniert's</div>
+    <h2 class="section-title" data-reveal>In <em>drei</em><br>Schritten</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <div class="step-title">Öffne die Karte</div>
+          <p class="step-text">Alle Food-Spots in deiner Umgebung erscheinen sofort als Pins. Kein Suchen, kein Scrollen durch Rezensionen.</p>
+        </div>
+      </div>
+      <div class="step" style="transition-delay:0.15s">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <div class="step-title">Filter & Entscheide</div>
+          <p class="step-text">High Protein Route? Vegan? Budget unter 15€? Einstellen, tippen, losgehen.</p>
+        </div>
+      </div>
+      <div class="step" style="transition-delay:0.3s">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <div class="step-title">Bewerte & Sammle</div>
+          <p class="step-text">War der Spot gut? Gib Up- oder Downvote, schreib einen Kommentar und sammel Punkte auf deinem Weg zum Tourer.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="how-visual">
+    <div style="position:relative;">
+      <div class="vc-stacked">
+        <div class="vc-stacked-row">
+          <div class="vc-dot"></div>
+          <span class="vc-rname">Sushi Nakamura</span>
+          <span class="vc-rscore">9.4 / 10</span>
+        </div>
+        <div class="vc-stacked-row">
+          <div class="vc-dot"></div>
+          <span class="vc-rname">Tacos El Gato</span>
+          <span class="vc-rscore">8.9 / 10</span>
+        </div>
+        <div class="vc-stacked-row">
+          <div class="vc-dot"></div>
+          <span class="vc-rname">Osteria Romana</span>
+          <span class="vc-rscore">9.1 / 10</span>
+        </div>
+      </div>
+      <div class="visual-card">
+        <div class="vc-map">
+          <div class="vc-map-grid"></div>
+          <div class="vc-pins">
+            <div class="vc-pin" style="top:25%;left:38%;"></div>
+            <div class="vc-pin" style="top:52%;left:62%;"></div>
+            <div class="vc-pin" style="top:18%;left:68%;"></div>
+            <div class="vc-pin" style="top:65%;left:22%;"></div>
+          </div>
+        </div>
+        <div class="vc-title">TOURED — Berlin Mitte</div>
+        <div class="vc-meta">
+          <span>📍 14 Spots</span>
+          <span>🔥 3 trending</span>
+          <span>⭐ Avg. 9.1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── AUDIENCE ── -->
+<section id="audience">
+  <div data-reveal>
+    <div class="section-label">Für wen</div>
+    <h2 class="section-title">Jeder <em>isst</em></h2>
+  </div>
+  <div class="audience-grid">
+    <div class="audience-card">
+      <div class="aud-bg"></div>
+      <div class="aud-icon">🍕</div>
+      <div class="aud-type">RESTAURANTS</div>
+      <p class="aud-desc">Reichweite steigern, Reservierungen gewinnen, Sichtbarkeit erhöhen — mit einem Profil das wirklich konvertiert.</p>
+      <div class="aud-tags">
+        <span class="aud-tag">Reichweite</span>
+        <span class="aud-tag">Reservierungen</span>
+      </div>
+    </div>
+    <div class="audience-card" style="transition-delay:0.1s">
+      <div class="aud-bg"></div>
+      <div class="aud-icon">✈️</div>
+      <div class="aud-type">TOURISTEN</div>
+      <p class="aud-desc">Lokale Spots statt Touristenfallen. Wir zeigen dir wo die Einheimischen essen — auch ohne Netz.</p>
+      <div class="aud-tags">
+        <span class="aud-tag">Lokal</span>
+        <span class="aud-tag">Offline</span>
+      </div>
+    </div>
+    <div class="audience-card" style="transition-delay:0.2s">
+      <div class="aud-bg"></div>
+      <div class="aud-icon">🎓</div>
+      <div class="aud-type">JUGEND</div>
+      <p class="aud-desc">Essen als Erlebnis. Entdecke, liste, teile — und werde Teil einer Community die Food ernst nimmt.</p>
+      <div class="aud-tags">
+        <span class="aud-tag">Community</span>
+        <span class="aud-tag">Punkte</span>
+      </div>
+    </div>
+    <div class="audience-card" style="transition-delay:0.3s">
+      <div class="aud-bg"></div>
+      <div class="aud-icon">📱</div>
+      <div class="aud-type">CREATOR</div>
+      <p class="aud-desc">Werde sichtbar, liefere wertvolle Inhalte und baue deinen Spot auf der Karte auf. Niedrige Einstiegshürde, hohe Wirkung.</p>
+      <div class="aud-tags">
+        <span class="aud-tag">Content</span>
+        <span class="aud-tag">Sichtbarkeit</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section id="cta">
+  <div data-reveal>
+    <h2 class="cta-title">
+      Bereit<br>zu <span class="red">touren?</span>
+    </h2>
+    <p class="cta-sub">Kostenlos herunterladen. Sofort loslegen.</p>
+    <div class="cta-badges">
+      <a href="#" class="store-btn">
+        <span class="store-icon">🍎</span>
+        <div class="store-label">
+          <div class="store-small">Download on the</div>
+          <div class="store-name">App Store</div>
+        </div>
+      </a>
+      <a href="#" class="store-btn">
+        <span class="store-icon">▶️</span>
+        <div class="store-label">
+          <div class="store-small">Get it on</div>
+          <div class="store-name">Google Play</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-left">
+    <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
+      <rect width="100" height="100" rx="18" fill="#C0281E"/>
+      <text x="50" y="42" font-family="'Bebas Neue', sans-serif" font-size="30" fill="white" text-anchor="middle" letter-spacing="1">TOU</text>
+      <text x="50" y="74" font-family="'Bebas Neue', sans-serif" font-size="30" fill="white" text-anchor="middle" letter-spacing="1">RED</text>
+    </svg>
+    <span class="footer-copy">©️ 2026 TOURED — All rights reserved</span>
+  </div>
+  <ul class="footer-links">
+    <li><a href="#">Datenschutz</a></li>
+    <li><a href="#">Impressum</a></li>
+    <li><a href="#">Instagram</a></li>
+    <li><a href="#">TikTok</a></li>
+  </ul>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible', 'revealed');
+        // feature cards
+        if (e.target.classList.contains('feature-card')) {
+          e.target.classList.add('visible');
+        }
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('[data-reveal], .feature-card, .step, .audience-card').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Parallax on hero elements
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    const circle = document.querySelector('.hero-bg-circle');
+    if (circle) circle.style.transform = `translateY(calc(-50% + ${y * 0.18}px))`;
+  });
+
+  // Stagger feature cards
+  document.querySelectorAll('.feature-card').forEach((card, i) => {
+    card.style.transitionDelay = (i * 0.08) + 's';
+  });
+
+  // Stagger audience cards
+  document.querySelectorAll('.audience-card').forEach((card, i) => {
+    card.style.transitionDelay = (i * 0.1) + 's';
+  });
+</script>
 </body>
 </html>
